@@ -10,13 +10,13 @@ import notesRoutes from './routes/notesRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT ?? 3030;
-app.use(logger);
 app.use(
   express.json({
     limit: '100kb', // максимум 100 кілобайт
   }),
 );
 app.use(cors());
+app.use(logger);
 
 app.use(notesRoutes);
 
