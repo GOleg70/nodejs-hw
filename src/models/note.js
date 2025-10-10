@@ -1,43 +1,47 @@
 import { Schema, model } from 'mongoose';
+import { TAGS } from '../constants/tags.js';
 
 // Фіксований список тегів (enum)
-const noteTags = [
-  'Work',
-  'Personal',
-  'Meeting',
-  'Shopping',
-  'Ideas',
-  'Travel',
-  'Finance',
-  'Health',
-  'Important',
-  'Todo',
-];
+// const noteTags = [
+//   'Work',
+//   'Personal',
+//   'Meeting',
+//   'Shopping',
+//   'Ideas',
+//   'Travel',
+//   'Finance',
+//   'Health',
+//   'Important',
+//   'Todo',
+// ];
 
 const noteSchema = new Schema(
   {
     title: {
       type: String,
-      required: true, // Обов'язкове поле
-      trim: true, // Обрізати пробіли на початку та в кінці
+      required: true,
+      trim: true,
     },
     content: {
       type: String,
-      default: '', // За замовчуванням порожній рядок
-      trim: true, // Обрізати пробіли
+      default: '',
+      trim: true,
     },
     tag: {
       type: String,
-      enum: noteTags, // Приймає лише значення з масиву noteTags
-      default: 'Todo', // За замовчуванням 'Todo'
+      enum: TAGS,
+      default: 'Todo',
     },
   },
   {
-    timestamps: true, // Автоматично додає createdAt та updatedAt
-    versionKey: false, // Приховує поле __v
-    // collection: 'notes', // Рекомендовано явно вказати назву колекції
+    timestamps: true,
+    versionKey: false,
   },
 );
 
-// Експортуємо модель, назва моделі — 'Note' (Mongoose створить колекцію 'notes')
+noteSchema.index({
+  title: 'text',
+  content: 'text',
+});
+
 export const Note = model('Note', noteSchema);
