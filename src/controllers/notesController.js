@@ -42,13 +42,22 @@ export const getAllNotes = async (req, res, next) => {
 export const getNoteById = async (req, res, next) => {
   const { noteId } = req.params;
 
-  const note = await Note.findById(noteId);
+  try {
+    const note = await Note.findById(noteId);
 
-  if (!note) {
-    return next(createHttpError(404, 'Note not found'));
+    if (!note) {
+      // Якщо ID валідний, але документ не знайдено
+      return next(createHttpError(404, 'Note not found'));
+    }
+
+    res.status(200).json(note);
+  } catch (error) {
+    // Якщо ID невалідний (CastError), обробляємо як 404
+    if (error.name === 'CastError') {
+      return next(createHttpError(404, 'Note not found'));
+    }
+    next(error);
   }
-
-  res.status(200).json(note);
 };
 
 export const createNote = async (req, res, next) => {
@@ -62,26 +71,45 @@ export const createNote = async (req, res, next) => {
 
 export const deleteNote = async (req, res, next) => {
   const { noteId } = req.params;
-  const note = await Note.findOneAndDelete({ _id: noteId });
 
-  if (!note) {
-    return next(createHttpError(404, 'Note not found'));
+  try {
+    const note = await Note.findOneAndDelete({ _id: noteId });
+
+    if (!note) {
+      // Якщо ID валідний, але документ не знайдено
+      return next(createHttpError(404, 'Note not found'));
+    }
+
+    res.status(200).json(note);
+  } catch (error) {
+    // Якщо ID невалідний (CastError), обробляємо як 404
+    if (error.name === 'CastError') {
+      return next(createHttpError(404, 'Note not found'));
+    }
+    next(error);
   }
-
-  res.status(200).json(note);
 };
 
 export const updateNote = async (req, res, next) => {
   const { noteId } = req.params;
 
-  const note = await Note.findOneAndUpdate({ _id: noteId }, req.body, {
-    new: true,
-    runValidators: true,
-  });
+  try {
+    const note = await Note.findOneAndUpdate({ _id: noteId }, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
-  if (!note) {
-    return next(createHttpError(404, 'Note not found'));
+    if (!note) {
+      // Якщо ID валідний, але документ не знайдено
+      return next(createHttpError(404, 'Note not found'));
+    }
+
+    res.status(200).json(note);
+  } catch (error) {
+    // Якщо ID невалідний (CastError), обробляємо як 404
+    if (error.name === 'CastError') {
+      return next(createHttpError(404, 'Note not found'));
+    }
+    next(error);
   }
-
-  res.status(200).json(note);
 };
