@@ -17,7 +17,7 @@ export const getAllNotes = async (req, res, next) => {
     filter.$text = { $search: search };
   }
 
-  const notesQuery = Note.find(filter);
+  const notesQuery = Note.find({ userId: req.user._id });
 
   try {
     const [totalNotes, notes] = await Promise.all([
@@ -43,7 +43,10 @@ export const getNoteById = async (req, res, next) => {
   const { noteId } = req.params;
 
   try {
-    const note = await Note.findById(noteId);
+    const note = await Note.findOne({
+      _id: noteId,
+      userId: req.user._id,
+    });
 
     if (!note) {
       // Якщо ID валідний, але документ не знайдено
@@ -62,7 +65,12 @@ export const getNoteById = async (req, res, next) => {
 
 export const createNote = async (req, res, next) => {
   try {
-    const note = await Note.create(req.body);
+    const note = await Note.create({
+      ...req.body,
+      // Додаємо властивість userId
+      userId: req.user._id,
+    });
+
     res.status(201).json(note);
   } catch (error) {
     next(error);
@@ -73,7 +81,11 @@ export const deleteNote = async (req, res, next) => {
   const { noteId } = req.params;
 
   try {
-    const note = await Note.findOneAndDelete({ _id: noteId });
+    const note = await Note.findOneAndDelete({
+      _id: noteId,
+      // Критерій пошуку по userId
+      userId: req.user._id,
+    });
 
     if (!note) {
       // Якщо ID валідний, але документ не знайдено
@@ -94,10 +106,14 @@ export const updateNote = async (req, res, next) => {
   const { noteId } = req.params;
 
   try {
-    const note = await Note.findOneAndUpdate({ _id: noteId }, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const note = await Note.findOneAndUpdate(
+      { _id: noteId, userId: req.user._id },
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
 
     if (!note) {
       // Якщо ID валідний, але документ не знайдено
