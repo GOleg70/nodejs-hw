@@ -19,7 +19,7 @@ export const getAllNotes = async (req, res, next) => {
     filter.$text = { $search: search };
   }
 
-  const notesQuery = Note.find({ userId: req.user._id });
+  const notesQuery = Note.find(filter);
 
   try {
     const [totalNotes, notes] = await Promise.all([
