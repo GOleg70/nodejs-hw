@@ -7,7 +7,9 @@ export const getAllNotes = async (req, res, next) => {
 
   const skip = (page - 1) * perPage;
 
-  const filter = {};
+  const filter = {
+    userId: req.user._id,
+  };
 
   if (tag) {
     filter.tag = tag;
